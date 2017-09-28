@@ -1,5 +1,5 @@
-# Emmi-ISO
-Programa feito em YAD Front do comando dd.<br>
-Serve para gravar midia iso.<br>
-<br>
-GPL License
+<h1 align="center">Emmi-ISO</h1>
+
+
+<p align="center"> 
+<a href="https://github.com/emmilinux/emmi-iso/blob/master/LICENSE"><img src="https://img.shields.io/github/license/mashape/apistatus.svg" alt="license"/></a></p>
