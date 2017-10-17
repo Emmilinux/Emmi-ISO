@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.1
+Type=Application
+Terminal=false
+Name[pt_BR]=Emmi ISO
+Exec=/usr/bin/emmiiso
+Icon[pt_BR]=/usr/share/pixmaps/penemmi.png
+Name=Emmi ISO
+Icon=/usr/share/pixmaps/penemmi.png
+Categories=Application;System;

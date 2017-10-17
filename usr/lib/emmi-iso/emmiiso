@@ -1,0 +1,81 @@
+#!/bin/bash
+# yad com FORMULARIOS, que bacana, tem algumas novidades aprecie com calma
+principal() {
+lsblk --output KNAME,MAJ:MIN,RM,SIZE,LABEL | grep "sd[a-z][0-9]\W*[0-9]*:[0-9].\W*[1]" > /tmp/usb
+PEN=`while read line; do echo -e "/dev/$line!" | awk '{print $1,$4}'; done < /tmp/usb`
+
+FORMULARIO=$( \
+   yad --form \
+       --title="Emmi ISO" \
+       --text "<span color='#CC2222'><big><b>Atenção!</b></big></span>\n\n Faça backup de seus arquivos pois o dispositivo será apagado\n" --text-align=center\
+       --width=500 \
+       --height=150 \
+       --form \
+       --image="/usr/share/pixmaps/penemmi.png" \
+       --field="Dispositivo:CB" "$PEN"\
+       --field="Selecionar arquivo:":FL "$HOME/$USER" \
+       --file-filter="Arquivos ISO| *.iso"\
+       --file-filter="Todos arquivos | *.*"\
+        --button=gtk-quit:1 \
+        --button=" Gravar!/usr/share/pixmaps/media-dvd.png":0 \
+)
+# ver se o usuário clicou em 'sair' or no 'x' da janela
+ACAO="$?"
+test "$ACAO" -eq "1" || test "$ACAO" -eq "252"
+if [ "$?" -eq "0" ]; then
+   exit
+fi
+
+DISPOSITIVO=$(echo "$FORMULARIO" | cut -d"|" -f 1|awk '{print $1}')
+ARQUIVO=$(echo "$FORMULARIO" | cut -d"|" -f 2)
+MONTADO=`mount | grep $DISPOSITIVO`
+
+#VALIDAR DISPOSITIVO
+if ! [ -e "$DISPOSITIVO" ] ; then
+yad --title="Erro" --text="Nenhum dispositivo selecionado!" --image=dialog-error --button=OK --width="280"
+principal
+fi
+
+echo $MONTADO
+if ! [ -z "$MONTADO" ]; then
+yad --title="Erro" --text="Dispositivo montado, favor desmontar o mesmo!" --image=dialog-error --button=Desmontar:10 --width="280"
+case $? in
+	10) umount $DISPOSITIVO ;;
+esac
+principal
+fi
+
+#VALIDAR ARQUIVO
+if ! [ -e "$ARQUIVO" ]; then
+yad --title="Erro" --text="Nenhum arquivo selecionado!" --image=dialog-error --button=OK --width="280"
+principal
+fi
+
+mkdir /tmp/PEN
+mkdir /tmp/ISO
+mount $DISPOSITIVO /tmp/PEN
+mount -t iso9660 $ARQUIVO /tmp/ISO
+cp -rf /tmp/ISO/* /tmp/PEN/  | bar=$(yad --progress --pulsate\
+         --title "Iniciando..." \
+         --width="300" \
+         --progress-text="Iniciando a gravação no dispositivo..." \
+         --pulsate \
+         --auto-close \
+    --no-buttons \
+         --auto-kill)
+
+chmod -R 777 /tmp/PEN/*
+umount /tmp/ISO
+umount /tmp/PEN | bar=$(yad --progress --pulsate\
+         --title "Gravando..." \
+         --width="300" \
+         --progress-text="Gravando a imagem no dispositivo..." \
+         --pulsate \
+         --auto-close \
+    --no-buttons \
+         --auto-kill) && zenity --window-icon=$ICONE --info --text=" Arquivos gravados com sucesso" || zenity --window-icon=$ICONE --error --text="Erro ao gravar ISO"
+rm -rf /tmp/ISO
+rm -rf /tmp/PEN
+}
+principal
+#.EOF
