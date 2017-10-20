@@ -2,7 +2,7 @@ Package: emmiiso
 Version: 0.5
 Section: system
 Priority: optional
-Architecture: all
+Architecture: i386 amd64 source
 Depends: yad
 Installed-Size: 100
 Maintainer: Sidnei Weber <sidnei.weber@gmail.com>
