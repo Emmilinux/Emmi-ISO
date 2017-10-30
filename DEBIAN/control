@@ -1,5 +1,5 @@
 Package: emmiiso
-Version: 0.5
+Version: 0.6
 Section: system
 Priority: optional
 Architecture: i386 amd64 source
